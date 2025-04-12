@@ -1,0 +1,10 @@
+{
+  "appId": "com.fuetime.app",
+  "appName": "Fuetime",
+  "webDir": "static",
+  "server": {
+    "androidScheme": "https",
+    "hostname": "localhost",
+    "url": "http://localhost:5000"
+  }
+}
