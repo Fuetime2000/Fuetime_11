@@ -51,7 +51,6 @@ login_manager.login_view = 'login'
 # Initialize SocketIO with CORS handling and other configurations
 socketio = SocketIO(app, 
                    cors_allowed_origins="*",
-                   async_mode='eventlet',
                    ping_timeout=5,
                    ping_interval=25,
                    max_http_buffer_size=10e6)
