@@ -1,0 +1,430 @@
+<div class="card profile-card h-100 border-0 shadow-sm rounded-4 overflow-hidden">
+    <div class="card-body p-0">
+        <!-- Profile Header with Background -->
+        <div class="position-relative mb-3">
+            <!-- Profile Background -->
+            <div class="profile-header" style="height: 60px; background: linear-gradient(45deg, #6b48ff, #8f69ff);"></div>
+            
+            <!-- Profile Image and Info -->
+            <div class="px-3">
+                <div class="d-flex position-relative" style="margin-top: -45px;">
+                    <div class="position-relative text-center" style="min-width: 90px;">
+                        {% if user.photo %}
+                        <img src="{{ url_for('static', filename='uploads/' + user.photo) }}" 
+                             class="rounded-circle border-3 border-white shadow-sm profile-image" 
+                             style="width: 90px; height: 90px; object-fit: cover;"
+                             alt="{{ user.full_name|default('User') }}"
+                             data-default-src="{{ url_for('static', filename='img/default-avatar.svg') }}">
+                        {% else %}
+                        <img src="{{ url_for('static', filename='img/default-avatar.svg') }}" 
+                             class="rounded-circle border-3 border-white shadow-sm" 
+                             style="width: 90px; height: 90px; object-fit: cover;"
+                             alt="{{ user.full_name|default('User') }}">
+                        {% endif %}
+                        <div class="mt-2">
+                            <a href="{{ url_for('profile', user_id=user.id) }}" class="text-decoration-none">
+                                <h5 class="mb-1 text-primary hover-underline" style="font-size: 0.9rem; color: #6b48ff !important;">{{ user.full_name|default('User') }}</h5>
+                            </a>
+                            <p class="text-muted mb-1" style="font-size: 0.8rem;">{{ user.work|default('Not specified') }}</p>
+                            <div class="rating">
+                                {% for i in range(user.average_rating|default(0)|int) %}
+                                <i class="fas fa-star" style="color: #FFD700; font-size: 0.8rem;"></i>
+                                {% endfor %}
+                                {% for i in range(5 - user.average_rating|default(0)|int) %}
+                                <i class="far fa-star" style="color: #FFD700; font-size: 0.8rem;"></i>
+                                {% endfor %}
+                                <span class="text-muted small ms-1" style="font-size: 0.75rem;">({{ user.total_reviews|default(0) }})</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="ms-3">
+                        <div class="d-flex justify-content-end">
+                            {% if user.is_online %}
+                            <span class="online-status-dot bg-success rounded-circle d-block shadow-sm" 
+                                  style="width: 12px; height: 12px; border: 2px solid white;"
+                                  data-user-id="{{ user.id }}" 
+                                  title="Online"></span>
+                            {% else %}
+                            <span class="online-status-dot bg-secondary rounded-circle d-block shadow-sm" 
+                                  style="width: 12px; height: 12px; border: 2px solid white;"
+                                  data-user-id="{{ user.id }}" 
+                                  title="Last seen: {{ user.last_active.strftime('%Y-%m-%d %H:%M') }}"></span>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Profile Info -->
+        <div class="px-3 pb-3">
+            <!-- Info Grid -->
+            <div class="row g-2 mb-3">
+                <div class="col-6">
+                    <div class="p-2 rounded-3 bg-light h-100">
+                        <div class="d-flex align-items-center mb-1">
+                            <i class="fas fa-briefcase text-primary fs-6 me-2"></i>
+                            <h6 class="mb-0" style="font-size: 0.8rem;">Experience</h6>
+                        </div>
+                        <p class="mb-0 text-muted" style="font-size: 0.75rem;">{{ user.experience|default('Not specified') }}</p>
+                    </div>
+                </div>
+                <div class="col-6">
+                    <div class="p-2 rounded-3 bg-light h-100">
+                        <div class="d-flex align-items-center mb-1">
+                            <i class="fas fa-graduation-cap text-info fs-6 me-2"></i>
+                            <h6 class="mb-0" style="font-size: 0.8rem;">Education</h6>
+                        </div>
+                        <p class="mb-0 text-muted" style="font-size: 0.75rem;">{{ user.education|default('Not specified') }}</p>
+                    </div>
+                </div>
+                <div class="col-6">
+                    <div class="p-2 rounded-3 bg-light h-100">
+                        <div class="d-flex align-items-center mb-1">
+                            <i class="fas fa-map-marker-alt text-danger fs-6 me-2"></i>
+                            <h6 class="mb-0" style="font-size: 0.8rem;">Location</h6>
+                        </div>
+                        <p class="mb-0 text-muted" style="font-size: 0.75rem;">{{ user.current_location|default('Not specified') }}</p>
+                    </div>
+                </div>
+                <div class="col-6">
+                    <div class="p-2 rounded-3 bg-light h-100">
+                        <div class="d-flex align-items-center mb-1">
+                            <i class="fas fa-rupee-sign text-success fs-6 me-2"></i>
+                            <h6 class="mb-0" style="font-size: 0.8rem;">Rate</h6>
+                        </div>
+                        <p class="mb-0 text-muted" style="font-size: 0.75rem;">{% if user.payment_charge %}₹{{ user.payment_charge }} / {{ user.payment_type|default('hour') }}{% else %}Not specified{% endif %}</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Skills -->
+            {% if user.skills %}
+            <div class="mb-3">
+                <h6 class="mb-2" style="font-size: 0.8rem;">Skills</h6>
+                <div class="d-flex flex-wrap gap-1">
+                    {% for skill in (user.skills or '').split(',') %}
+                    {% if skill.strip() %}
+                    <span class="badge rounded-pill bg-primary bg-opacity-10 text-primary px-2 py-1" style="font-size: 0.75rem;">{{ skill.strip() }}</span>
+                    {% endif %}
+                    {% endfor %}
+                </div>
+            </div>
+            {% endif %}
+
+            <!-- Action Buttons -->
+            {% if current_user.is_authenticated and current_user.id != user.id %}
+            <div class="d-flex gap-1 flex-wrap justify-content-between">
+                <button class="btn btn-primary btn-sm contact-btn compact-btn" 
+                        data-contact-type="chat" 
+                        data-user-id="{{ user.id }}">
+                    <i class="fas fa-comment-alt me-1"></i>Chat
+                </button>
+                <button class="btn btn-outline-primary btn-sm contact-btn compact-btn" 
+                        data-contact-type="email" 
+                        data-user-id="{{ user.id }}"
+                        data-email="{{ user.email }}">
+                    <i class="fas fa-envelope me-1"></i>Email
+                </button>
+                <button class="btn btn-outline-primary btn-sm contact-btn compact-btn" 
+                        data-contact-type="call" 
+                        data-user-id="{{ user.id }}"
+                        data-phone="{{ user.phone }}">
+                    <i class="fas fa-phone me-1"></i>Call
+                </button>
+                <button class="btn btn-outline-primary btn-sm share-btn compact-btn" 
+                        onclick="shareProfile('{{ user.id }}')">
+                    <i class="fas fa-share-alt me-1"></i>Share
+                </button>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+
+<!-- Payment Modal -->
+<div class="modal fade" id="paymentModal" tabindex="-1">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content rounded-4 border-0 shadow">
+            <div class="modal-header border-0">
+                <h5 class="modal-title">Payment Required</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <p>To contact this user, you need to make a payment first.</p>
+                <div class="alert alert-info">
+                    <i class="fas fa-info-circle me-2"></i>
+                    <span id="paymentAmount"></span>
+                </div>
+            </div>
+            <div class="modal-footer border-0">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                <button type="button" class="btn btn-primary" id="proceedPayment">
+                    <i class="fas fa-lock me-2"></i>Proceed to Payment
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const paymentModal = new bootstrap.Modal(document.getElementById('paymentModal'));
+    const contactButtons = document.querySelectorAll('.contact-btn');
+    
+    function handleContactAction(button, contactType) {
+        const userId = button.dataset.userId;
+        
+        if (contactType === 'chat') {
+            window.location.href = `/messages?user_id=${userId}`;
+        } else if (contactType === 'email') {
+            const email = button.dataset.email;
+            if (email) {
+                window.location.href = `mailto:${email}`;
+            } else {
+                alert('Email not available');
+            }
+        } else if (contactType === 'call') {
+            const phone = button.dataset.phone;
+            if (phone) {
+                window.location.href = `tel:${phone}`;
+            } else {
+                alert('Phone number not available');
+            }
+        }
+    }
+    
+    contactButtons.forEach(button => {
+        button.addEventListener('click', async function() {
+            const contactType = this.dataset.contactType;
+            const userId = this.dataset.userId;
+            
+            if (contactType === 'chat') {
+                // For chat, we'll show payment modal
+                try {
+                    const response = await fetch(`/api/check_contact_payment/${userId}/chat`);
+                    const data = await response.json();
+                    
+                    if (data.payment_required) {
+                        document.getElementById('paymentAmount').textContent = `Payment amount: ₹${data.amount}`;
+                        
+                        const proceedBtn = document.getElementById('proceedPayment');
+                        proceedBtn.onclick = async () => {
+                            try {
+                                const paymentResponse = await fetch('/api/initiate_payment', {
+                                    method: 'POST',
+                                    headers: {
+                                        'Content-Type': 'application/json'
+                                    },
+                                    body: JSON.stringify({
+                                        user_id: userId,
+                                        contact_type: 'chat',
+                                        amount: data.amount
+                                    })
+                                });
+                                
+                                const paymentData = await paymentResponse.json();
+                                if (paymentData.success) {
+                                    paymentModal.hide();
+                                    handleContactAction(this, contactType);
+                                }
+                            } catch (error) {
+                                console.error('Payment error:', error);
+                                alert('Payment failed. Please try again.');
+                            }
+                        };
+                        
+                        paymentModal.show();
+                    } else {
+                        handleContactAction(this, contactType);
+                    }
+                } catch (error) {
+                    console.error('Error checking payment:', error);
+                    alert('An error occurred. Please try again.');
+                }
+            } else {
+                // For email and call, directly handle the action
+                handleContactAction(this, contactType);
+            }
+        });
+    });
+});
+
+function shareProfile(userId) {
+    const url = window.location.origin + `/profile/${userId}`;
+    
+    if (navigator.share) {
+        navigator.share({
+            title: 'Check out this profile on Fuetime',
+            text: 'I found this interesting profile on Fuetime',
+            url: url
+        }).catch(() => {
+            fallbackShare(url);
+        });
+    } else {
+        fallbackShare(url);
+    }
+}
+
+function fallbackShare(url) {
+    navigator.clipboard.writeText(url).then(() => {
+        alert('Profile link copied to clipboard!');
+    }).catch(() => {
+        alert('Failed to copy link. Please try again.');
+    });
+}
+</script>
+
+<style>
+.profile-card {
+    transition: transform 0.2s ease-in-out;
+    border-radius: 1rem !important;
+}
+
+/* Media query for mobile devices */
+@media (max-width: 576px) {
+    .profile-card {
+        border-radius: 0 !important;
+        margin: -1rem -1rem 0 -1rem; /* Extend card to edges on mobile */
+    }
+    
+    .profile-card .card-body {
+        padding: 0;
+    }
+    
+    /* Adjust inner elements border radius */
+    .profile-card .rounded-4 {
+        border-radius: 0 !important;
+    }
+    
+    .profile-card .rounded-3 {
+        border-radius: 0.5rem !important;
+    }
+    
+    /* Keep the profile image round */
+    .profile-card .rounded-circle {
+        border-radius: 50% !important;
+    }
+}
+
+/* Hover effects only for desktop */
+@media (min-width: 577px) {
+    .profile-card:hover {
+        transform: translateY(-5px);
+    }
+    
+    .hover-underline:hover {
+        text-decoration: underline !important;
+    }
+}
+
+/* Keep existing styles */
+.online-status-dot {
+    transition: background-color 0.3s ease;
+}
+
+.rating {
+    display: inline-block;
+}
+
+.share-btn {
+    width: 40px;
+    padding-left: 0;
+    padding-right: 0;
+}
+
+.contact-btn {
+    transition: all 0.2s ease;
+}
+
+.contact-btn:hover {
+    transform: translateY(-2px);
+}
+
+.btn {
+    padding: 0.5rem 1rem;
+    font-weight: 500;
+    transition: all 0.3s ease;
+}
+
+.btn-primary {
+    background: linear-gradient(45deg, #6b48ff, #8f69ff);
+    border: none;
+}
+
+.btn-primary:hover {
+    background: linear-gradient(45deg, #5a3dd9, #7e5ce0);
+    transform: translateY(-2px);
+}
+
+.btn-outline-primary {
+    border-color: #6b48ff;
+    color: #6b48ff;
+}
+
+.btn-outline-primary:hover {
+    background: linear-gradient(45deg, #6b48ff, #8f69ff);
+    border-color: transparent;
+    color: white;
+    transform: translateY(-2px);
+}
+
+.modal-content {
+    border: none;
+}
+
+.alert {
+    border: none;
+    border-radius: 1rem;
+}
+
+.bg-light {
+    background-color: #f8f9fa !important;
+}
+
+.text-primary {
+    color: #6b48ff !important;
+}
+
+.bg-primary {
+    background-color: #6b48ff !important;
+}
+
+.hover-underline:hover {
+    text-decoration: underline !important;
+}
+
+/* Responsive Styles */
+@media (max-width: 576px) {
+    .profile-card {
+        border-radius: 0;
+    }
+    
+    .profile-header {
+        height: 100px;
+    }
+    
+    .btn {
+        width: 100%;
+        margin-bottom: 0.5rem;
+    }
+    
+    .d-flex.gap-2 {
+        flex-direction: column;
+    }
+}
+
+@media (max-width: 768px) {
+    .profile-card .col-sm-6 {
+        margin-bottom: 1rem;
+    }
+}
+
+.compact-btn {
+    font-size: 0.7rem !important;
+    padding: 0.2rem 0.4rem !important;
+    line-height: 1.2 !important;
+    width: calc(25% - 0.75rem) !important;
+    white-space: nowrap !important;
+}
+</style>

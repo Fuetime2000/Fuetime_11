@@ -1,0 +1,576 @@
+{% extends "base.html" %}
+
+{% block head %}
+<script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.0.1/socket.io.js"></script>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
+<style>
+:root {
+    --primary-color: #4f46e5;
+    --secondary-color: #818cf8;
+    --background-color: #f3f4f6;
+    --text-primary: #1f2937;
+    --text-secondary: #6b7280;
+    --message-sent: var(--primary-color);
+    --message-received: #ffffff;
+    --transition-speed: 0.3s;
+}
+
+body {
+    background-color: var(--background-color);
+    color: var(--text-primary);
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+}
+
+.chat-container {
+    height: calc(100vh - 80px);
+    display: flex;
+    flex-direction: column;
+    background: #ffffff;
+    border-radius: 16px;
+    overflow: hidden;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.08);
+    margin: 20px auto;
+    max-width: 1200px;
+    transition: all var(--transition-speed) ease;
+}
+
+.chat-header {
+    padding: 20px;
+    background: #ffffff;
+    border-bottom: 1px solid rgba(0,0,0,0.05);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    position: sticky;
+    top: 0;
+    z-index: 10;
+}
+
+.chat-user-info {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.user-avatar img {
+    width: 48px;
+    height: 48px;
+    border-radius: 50%;
+    object-fit: cover;
+    border: 2px solid var(--primary-color);
+    transition: transform var(--transition-speed);
+}
+
+.user-avatar img:hover {
+    transform: scale(1.05);
+}
+
+.user-status {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 0.95rem;
+    color: var(--text-secondary);
+}
+
+.status-indicator {
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    background: #dc3545;
+    transition: background-color var(--transition-speed);
+}
+
+.status-indicator.online {
+    background: #10b981;
+}
+
+.chat-messages {
+    flex-grow: 1;
+    padding: 24px;
+    overflow-y: auto;
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    scroll-behavior: smooth;
+}
+
+.chat-messages::-webkit-scrollbar {
+    width: 6px;
+}
+
+.chat-messages::-webkit-scrollbar-track {
+    background: transparent;
+}
+
+.chat-messages::-webkit-scrollbar-thumb {
+    background: var(--text-secondary);
+    border-radius: 3px;
+}
+
+.message {
+    display: flex;
+    gap: 12px;
+    max-width: 75%;
+    animation: messageAppear 0.3s ease;
+}
+
+@keyframes messageAppear {
+    from {
+        opacity: 0;
+        transform: translateY(10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.message.received {
+    align-self: flex-start;
+}
+
+.message.sent {
+    align-self: flex-end;
+    flex-direction: row-reverse;
+}
+
+.message-avatar img {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    object-fit: cover;
+    border: 2px solid transparent;
+    transition: border-color var(--transition-speed);
+}
+
+.message-content {
+    background: var(--message-received);
+    padding: 12px 16px;
+    border-radius: 16px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+    position: relative;
+    transition: transform var(--transition-speed);
+}
+
+.message-content:hover {
+    transform: translateY(-1px);
+}
+
+.message.sent .message-content {
+    background: var(--message-sent);
+    color: #ffffff;
+}
+
+.message-text {
+    margin-bottom: 4px;
+    word-break: break-word;
+    line-height: 1.5;
+}
+
+.message-attachment {
+    margin-top: 8px;
+    border-radius: 12px;
+    overflow: hidden;
+}
+
+.message-attachment img {
+    max-width: 300px;
+    max-height: 300px;
+    border-radius: 12px;
+    cursor: zoom-in;
+    transition: transform var(--transition-speed);
+}
+
+.message-attachment img:hover {
+    transform: scale(1.02);
+}
+
+.message-time {
+    font-size: 0.8rem;
+    color: var(--text-secondary);
+    margin-top: 4px;
+}
+
+.message.sent .message-time {
+    color: rgba(255,255,255,0.9);
+}
+
+.chat-input {
+    padding: 20px;
+    background: #ffffff;
+    border-top: 1px solid rgba(0,0,0,0.05);
+    position: relative;
+}
+
+.message-form {
+    display: flex;
+    gap: 12px;
+    align-items: flex-end;
+}
+
+.input-group {
+    position: relative;
+    flex-grow: 1;
+}
+
+.form-control {
+    border-radius: 24px;
+    padding: 12px 20px;
+    padding-right: 45px;
+    resize: none;
+    max-height: 120px;
+    border: 2px solid rgba(0,0,0,0.1);
+    transition: border-color var(--transition-speed);
+    font-size: 1rem;
+    line-height: 1.5;
+}
+
+.form-control:focus {
+    border-color: var(--primary-color);
+    box-shadow: none;
+}
+
+.btn-icon {
+    width: 45px;
+    height: 45px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: none;
+    border: none;
+    color: var(--text-secondary);
+    transition: all var(--transition-speed);
+    cursor: pointer;
+}
+
+.btn-icon:hover {
+    color: var(--primary-color);
+    transform: scale(1.05);
+}
+
+.btn-send {
+    background: var(--primary-color);
+    color: #ffffff;
+    transition: all var(--transition-speed);
+}
+
+.btn-send:hover {
+    background: var(--secondary-color);
+    transform: scale(1.05);
+}
+
+.preview-container {
+    position: absolute;
+    bottom: 100%;
+    left: 0;
+    right: 0;
+    background: #ffffff;
+    border: 1px solid rgba(0,0,0,0.1);
+    border-radius: 16px;
+    padding: 16px;
+    margin-bottom: 12px;
+    box-shadow: 0 -4px 12px rgba(0,0,0,0.05);
+    display: none;
+    animation: slideUp 0.3s ease;
+}
+
+@keyframes slideUp {
+    from {
+        opacity: 0;
+        transform: translateY(10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.preview-container.show {
+    display: block;
+}
+
+.preview-content {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+@media (max-width: 768px) {
+    .chat-container {
+        height: calc(100vh - 40px);
+        margin: 10px;
+        border-radius: 12px;
+    }
+
+    .message {
+        max-width: 85%;
+    }
+
+    .message-attachment img {
+        max-width: 200px;
+        max-height: 200px;
+    }
+
+    .chat-header {
+        padding: 15px;
+    }
+
+    .user-avatar img {
+        width: 40px;
+        height: 40px;
+    }
+
+    .chat-messages {
+        padding: 16px;
+    }
+
+    .chat-input {
+        padding: 15px;
+    }
+}
+
+@media (max-width: 480px) {
+    .message {
+        max-width: 90%;
+    }
+
+    .message-avatar img {
+        width: 32px;
+        height: 32px;
+    }
+
+    .message-attachment img {
+        max-width: 160px;
+        max-height: 160px;
+    }
+
+    .btn-icon {
+        width: 40px;
+        height: 40px;
+    }
+}
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="chat-container">
+    <div class="chat-header">
+        <div class="chat-user-info">
+            <div class="user-avatar">
+                {% if receiver.photo %}
+                    <img src="{{ receiver.photo }}" alt="{{ receiver.full_name }}" />
+                {% else %}
+                    <img src="{{ url_for('static', filename='images/default-avatar.png') }}" alt="{{ receiver.full_name }}" />
+                {% endif %}
+            </div>
+            <div class="user-details">
+                <h4>{{ receiver.full_name }}</h4>
+                <div class="user-status">
+                    <span class="status-indicator {% if receiver.is_online %}online{% endif %}"></span>
+                    <span>{{ 'Online' if receiver.is_online else 'Offline' }}</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="chat-messages" id="chat-messages">
+        {% for message in messages %}
+            <div class="message {% if message.sender_id == current_userid %}sent{% else %}received{% endif %}">
+                <div class="message-content">
+                    {% if message.content %}
+                        <p>{{ message.content }}</p>
+                    {% endif %}
+                    {% if message.attachment %}
+                        <div class="attachment">
+                            {% if message.attachment.lower().endswith(('.png', '.jpg', '.jpeg', '.gif', '.webp')) %}
+                                <img src="{{ message.attachment }}" alt="Attachment" onclick="openImagePreview('{{ message.attachment }}')" />
+                            {% else %}
+                                <a href="{{ message.attachment }}" target="_blank" class="attachment-link">
+                                    <i class="fas fa-file"></i>
+                                    <span>View Attachment</span>
+                                </a>
+                            {% endif %}
+                        </div>
+                    {% endif %}
+                    <span class="message-time">{{ message.created_at.strftime('%H:%M') }}</span>
+                </div>
+            </div>
+        {% endfor %}
+    </div>
+
+    <form id="message-form" class="chat-input" enctype="multipart/form-data">
+        <div id="preview-container" class="preview-container">
+            <img id="preview-image" class="preview-image d-none" alt="Attachment preview">
+            <i id="preview-icon" class="fas fa-file preview-icon d-none"></i>
+            <button type="button" class="btn-close" onclick="removeAttachment()"></button>
+        </div>
+        <div class="input-group">
+            <input type="text" name="content" class="form-control" placeholder="Type your message..." autocomplete="off">
+            <label for="attachment" class="btn btn-icon">
+                <i class="fas fa-paperclip"></i>
+                <input type="file" id="attachment" name="attachment" class="d-none">
+            </label>
+            <button type="submit" class="btn btn-icon">
+                <i class="fas fa-paper-plane"></i>
+            </button>
+        </div>
+    </form>
+</div>
+
+<div class="modal fade" id="image-preview-modal" tabindex="-1">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <img id="modal-image" src="" class="img-fluid" alt="Image preview">
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    const socket = io('/', {
+        reconnection: true,
+        reconnectionAttempts: 5,
+        reconnectionDelay: 1000
+    });
+
+    const currentUserId = { current_userid };
+    const receiverId = { receiverid };
+    const messageForm = document.getElementById('message-form');
+    const attachmentInput = document.getElementById('attachment');
+    const previewContainer = document.getElementById('preview-container');
+    const previewImage = document.getElementById('preview-image');
+    const removePreviewBtn = document.getElementById('remove-preview');
+    const chatMessages = document.getElementById('chat-messages');
+    const imagePreviewModal = new bootstrap.Modal(document.getElementById('image-preview-modal'));
+
+    // Join user's room for receiving messages
+    socket.on('connect', () => {
+        socket.emit('join', { room: `user_${currentUserId}` });
+        console.log('Connected to Socket.IO');
+    });
+
+    socket.on('connect_error', (error) => {
+        console.error('Socket.IO connection error:', error);
+    });
+
+    function scrollToBottom() {
+        chatMessages.scrollTop = chatMessages.scrollHeight;
+    }
+
+    function formatTimestamp(timestamp) {
+        const date = new Date(timestamp);
+        return date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+    }
+
+    function generateAttachmentHtml(attachment) {
+        if (!attachment) return '';
+        
+        const isImage = /\.(png|jpg|jpeg|gif|webp)$/i.test(attachment);
+        if (isImage) {
+            return `
+                <div class="attachment">
+                    <img src="${escapeHtml(attachment)}" alt="Attachment" onclick="openImagePreview('${escapeHtml(attachment)}')" />
+                </div>`;
+        }
+        return `
+            <div class="attachment">
+                <a href="${escapeHtml(attachment)}" target="_blank" class="attachment-link">
+                    <i class="fas fa-file"></i>
+                    <span>View Attachment</span>
+                </a>
+            </div>`;
+    }
+
+    socket.on('receive_message', async function(data) {
+        const isCurrentUser = data.sender_id === currentUserId;
+        
+        const messageHtml = `
+            <div class="message ${isCurrentUser ? 'sent' : 'received'}">
+                <div class="message-content">
+                    ${data.content ? `<p>${escapeHtml(data.content)}</p>` : ''}
+                    ${generateAttachmentHtml(data.attachment)}
+                    <span class="message-time">${formatTimestamp(data.timestamp)}</span>
+                </div>
+            </div>`;
+        
+        chatMessages.insertAdjacentHTML('beforeend', messageHtml);
+        scrollToBottom();
+    });
+
+    function escapeHtml(unsafe) {
+        return unsafe
+            .replace(/&/g, "&amp;")
+            .replace(/</g, "&lt;")
+            .replace(/>/g, "&gt;")
+            .replace(/"/g, "&quot;")
+            .replace(/'/g, "&#039;");
+    }
+    
+    attachmentInput.addEventListener('change', function(e) {
+        const file = e.target.files[0];
+        if (file) {
+            previewContainer.classList.add('show');
+            if (file.type.startsWith('image/')) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    previewImage.src = e.target.result;
+                    previewImage.classList.remove('d-none');
+                    previewIcon.classList.add('d-none');
+                };
+                reader.readAsDataURL(file);
+            } else {
+                previewImage.classList.add('d-none');
+                previewIcon.classList.remove('d-none');
+            }
+        }
+    });
+
+    function removeAttachment() {
+        attachmentInput.value = '';
+        previewContainer.classList.remove('show');
+        previewImage.classList.add('d-none');
+        previewIcon.classList.add('d-none');
+    }
+    
+    messageForm.addEventListener('submit', async function(e) {
+        e.preventDefault();
+        
+        const formData = new FormData(this);
+        
+        try {
+            const response = await fetch(`/chat/${receiverId}`, {
+                method: 'POST',
+                body: formData
+            });
+            
+            const result = await response.json();
+            
+            if (result.status === 'success') {
+                this.reset();
+                removeAttachment();
+            } else {
+                console.error('Error sending message:', result.message);
+                alert('Error sending message. Please try again.');
+            }
+        } catch (error) {
+            console.error('Error:', error);
+            alert('Error sending message. Please try again.');
+        }
+    });
+
+    function openImagePreview(src) {
+        document.getElementById('modal-image').src = src;
+        imagePreviewModal.show();
+    }
+    
+    scrollToBottom();
+</script>
+{% endblock %}

@@ -1,0 +1,307 @@
+{% extends "admin/base.html" %}
+
+{% block title %}{{ _('Admin Dashboard') }} - FueTime{% endblock %}
+
+{% block admin_title %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h1 class="h3 mb-0">{{ _('Admin Dashboard') }}</h1>
+    <div class="theme-toggle">
+        <button class="btn btn-light" id="theme-toggle">
+            <i class="fas fa-moon"></i>
+        </button>
+    </div>
+</div>
+{% endblock %}
+
+{% block admin_content %}
+<!-- Quick Actions -->
+<div class="quick-actions mb-4">
+    <a href="{{ url_for('admin_users') }}" class="quick-action-btn">
+        <i class="fas fa-user-plus"></i>
+        {{ _('Add User') }}
+    </a>
+    <a href="{{ url_for('admin_transactions') }}" class="quick-action-btn">
+        <i class="fas fa-money-check"></i>
+        {{ _('New Transaction') }}
+    </a>
+    <a href="#" class="quick-action-btn" id="exportData">
+        <i class="fas fa-file-export"></i>
+        {{ _('Export Data') }}
+    </a>
+</div>
+
+<!-- Statistics Cards -->
+<div class="row g-4 mb-4">
+    <div class="col-xl-3 col-md-6">
+        <div class="card stat-card stat-card-primary h-100">
+            <div class="card-body">
+                <div class="d-flex justify-content-between align-items-center">
+                    <div>
+                        <div class="card-title">{{ _('Total Users') }}</div>
+                        <div class="stat-value">{{ total_users }}</div>
+                        <div class="stat-change">
+                            <i class="fas fa-arrow-up"></i>
+                            <span>12% {{ _('this month') }}</span>
+                        </div>
+                    </div>
+                    <div class="stat-icon">
+                        <i class="fas fa-users"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-xl-3 col-md-6">
+        <div class="card stat-card stat-card-success h-100">
+            <div class="card-body">
+                <div class="d-flex justify-content-between align-items-center">
+                    <div>
+                        <div class="card-title">{{ _('Total Transactions') }}</div>
+                        <div class="stat-value">{{ total_transactions }}</div>
+                        <div class="stat-change">
+                            <i class="fas fa-arrow-up"></i>
+                            <span>8% {{ _('this month') }}</span>
+                        </div>
+                    </div>
+                    <div class="stat-icon">
+                        <i class="fas fa-money-bill-wave"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-xl-3 col-md-6">
+        <div class="card stat-card stat-card-info h-100">
+            <div class="card-body">
+                <div class="d-flex justify-content-between align-items-center">
+                    <div>
+                        <div class="card-title">{{ _('Contact Requests') }}</div>
+                        <div class="stat-value">{{ total_contact_requests }}</div>
+                        <div class="stat-change">
+                            <i class="fas fa-arrow-down"></i>
+                            <span>3% {{ _('this month') }}</span>
+                        </div>
+                    </div>
+                    <div class="stat-icon">
+                        <i class="fas fa-envelope"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-xl-3 col-md-6">
+        <div class="card stat-card stat-card-warning h-100">
+            <div class="card-body">
+                <div class="d-flex justify-content-between align-items-center">
+                    <div>
+                        <div class="card-title">{{ _('Total Reviews') }}</div>
+                        <div class="stat-value">{{ total_reviews }}</div>
+                        <div class="stat-change">
+                            <i class="fas fa-arrow-up"></i>
+                            <span>15% {{ _('this month') }}</span>
+                        </div>
+                    </div>
+                    <div class="stat-icon">
+                        <i class="fas fa-star"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Charts Row -->
+<div class="row g-4 mb-4">
+    <div class="col-xl-8 col-lg-7">
+        <div class="chart-card">
+            <h6 class="mb-3">{{ _('User Growth') }}</h6>
+            <div class="chart-container">
+                <canvas id="userGrowthChart"></canvas>
+            </div>
+        </div>
+    </div>
+    <div class="col-xl-4 col-lg-5">
+        <div class="chart-card">
+            <h6 class="mb-3">{{ _('Transaction Distribution') }}</h6>
+            <div class="chart-container">
+                <canvas id="transactionChart"></canvas>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Recent Activity -->
+<div class="row g-4">
+    <!-- Recent Users -->
+    <div class="col-xl-6">
+        <div class="card table-card">
+            <div class="card-header d-flex justify-content-between align-items-center">
+                <h6 class="text-primary mb-0">{{ _('Recent Users') }}</h6>
+                <a href="{{ url_for('admin_users') }}" class="btn btn-sm btn-primary">
+                    {{ _('View All') }}
+                </a>
+            </div>
+            <div class="card-body">
+                <div class="table-responsive">
+                    <table class="table align-middle">
+                        <thead>
+                            <tr>
+                                <th>{{ _('Name') }}</th>
+                                <th>{{ _('Email') }}</th>
+                                <th>{{ _('Joined') }}</th>
+                                <th>{{ _('Status') }}</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for user in recent_users %}
+                            <tr>
+                                <td>
+                                    <div class="d-flex align-items-center">
+                                        <img src="{{ user.photo or url_for('static', filename='img/default-avatar.png') }}" 
+                                             class="rounded-circle me-2" width="32" height="32" alt="">
+                                        <a href="{{ url_for('admin_user_detail', username=user.username) }}" class="text-decoration-none">
+                                            {{ user.full_name }}
+                                        </a>
+                                    </div>
+                                </td>
+                                <td>{{ user.email }}</td>
+                                <td>{{ user.created_at.strftime('%Y-%m-%d') }}</td>
+                                <td>
+                                    <span class="badge {% if user.is_online %}bg-success{% else %}bg-secondary{% endif %}">
+                                        {{ _('Online') if user.is_online else _('Offline') }}
+                                    </span>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Recent Transactions -->
+    <div class="col-xl-6">
+        <div class="card table-card">
+            <div class="card-header d-flex justify-content-between align-items-center">
+                <h6 class="text-primary mb-0">{{ _('Recent Transactions') }}</h6>
+                <a href="{{ url_for('admin_transactions') }}" class="btn btn-sm btn-primary">
+                    {{ _('View All') }}
+                </a>
+            </div>
+            <div class="card-body">
+                <div class="table-responsive">
+                    <table class="table align-middle">
+                        <thead>
+                            <tr>
+                                <th>{{ _('User') }}</th>
+                                <th>{{ _('Amount') }}</th>
+                                <th>{{ _('Description') }}</th>
+                                <th>{{ _('Date') }}</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for transaction in recent_transactions %}
+                            <tr>
+                                <td>{{ transaction.user.full_name }}</td>
+                                <td>
+                                    <span class="{% if transaction.amount >= 0 %}text-success{% else %}text-danger{% endif %}">
+                                        ₹{{ "%.2f"|format(transaction.amount) }}
+                                    </span>
+                                </td>
+                                <td>{{ transaction.description }}</td>
+                                <td>{{ transaction.timestamp.strftime('%Y-%m-%d') }}</td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Charts JS -->
+{% block extra_js %}
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // User Growth Chart
+    const userCtx = document.getElementById('userGrowthChart').getContext('2d');
+    new Chart(userCtx, {
+        type: 'line',
+        data: {
+            labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun'],
+            datasets: [{
+                label: '{{ _("New Users") }}',
+                data: [65, 78, 90, 85, 99, 112],
+                borderColor: '#4e73df',
+                tension: 0.3,
+                fill: true,
+                backgroundColor: 'rgba(78, 115, 223, 0.1)'
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                legend: {
+                    display: false
+                }
+            },
+            scales: {
+                y: {
+                    beginAtZero: true
+                }
+            }
+        }
+    });
+
+    // Transaction Distribution Chart
+    const transactionCtx = document.getElementById('transactionChart').getContext('2d');
+    new Chart(transactionCtx, {
+        type: 'doughnut',
+        data: {
+            labels: ['{{ _("Deposits") }}', '{{ _("Withdrawals") }}', '{{ _("Fees") }}'],
+            datasets: [{
+                data: [65, 25, 10],
+                backgroundColor: ['#1cc88a', '#e74a3b', '#f6c23e']
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                legend: {
+                    position: 'bottom'
+                }
+            }
+        }
+    });
+
+    // Theme Toggle
+    const themeToggle = document.getElementById('theme-toggle');
+    const body = document.body;
+    const icon = themeToggle.querySelector('i');
+
+    themeToggle.addEventListener('click', () => {
+        body.setAttribute('data-theme', 
+            body.getAttribute('data-theme') === 'dark' ? 'light' : 'dark'
+        );
+        icon.classList.toggle('fa-moon');
+        icon.classList.toggle('fa-sun');
+    });
+
+    // Export Data
+    document.getElementById('exportData').addEventListener('click', (e) => {
+        e.preventDefault();
+        alert('{{ _("Exporting data...") }}');
+        // Implement export functionality here
+    });
+});
+</script>
+{% endblock %}
+{% endblock %}

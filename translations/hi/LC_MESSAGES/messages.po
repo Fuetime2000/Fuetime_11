@@ -1,0 +1,97 @@
+msgid ""
+msgstr ""
+"Project-Id-Version: Fuetime\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2024-02-18 08:30+0530\n"
+"PO-Revision-Date: 2024-02-18 08:30+0530\n"
+"Last-Translator: \n"
+"Language-Team: Hindi\n"
+"Language: hi\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+
+msgid "Fuetime - Connect with Skilled People"
+msgstr "फ्यूटाइम - कुशल लोगों से जुड़ें"
+
+msgid "Fuetime"
+msgstr "फ्यूटाइम"
+
+msgid "Home"
+msgstr "होम"
+
+msgid "Messages"
+msgstr "संदेश"
+
+msgid "My Profile"
+msgstr "मेरी प्रोफाइल"
+
+msgid "Account Settings"
+msgstr "खाता सेटिंग्स"
+
+msgid "Logout"
+msgstr "लॉग आउट"
+
+msgid "Login"
+msgstr "लॉग इन"
+
+msgid "Register"
+msgstr "रजिस्टर"
+
+msgid "Find Skilled People Near You"
+msgstr "आपके पास कुशल लोग खोजें"
+
+msgid "Search by skills or services"
+msgstr "कौशल या सेवाओं द्वारा खोजें"
+
+msgid "Enter location"
+msgstr "स्थान दर्ज करें"
+
+msgid "Search"
+msgstr "खोजें"
+
+msgid "Email already registered"
+msgstr "ईमेल पहले से पंजीकृत है"
+
+msgid "Registration successful!"
+msgstr "पंजीकरण सफल!"
+
+msgid "Logged in successfully!"
+msgstr "सफलतापूर्वक लॉग इन हो गया!"
+
+msgid "Invalid email or password"
+msgstr "अमान्य ईमेल या पासवर्ड"
+
+msgid "Logged out successfully"
+msgstr "सफलतापूर्वक लॉग आउट हो गया"
+
+msgid "You cannot review yourself"
+msgstr "आप खुद की समीक्षा नहीं कर सकते"
+
+msgid "Review submitted successfully"
+msgstr "समीक्षा सफलतापूर्वक जमा की गई"
+
+msgid "You cannot message yourself"
+msgstr "आप खुद को संदेश नहीं भेज सकते"
+
+msgid "Message sent successfully"
+msgstr "संदेश सफलतापूर्वक भेजा गया"
+
+msgid "Profile updated successfully!"
+msgstr "प्रोफ़ाइल सफलतापूर्वक अपडेट की गई!"
+
+msgid "Current password is incorrect"
+msgstr "वर्तमान पासवर्ड गलत है"
+
+msgid "New passwords do not match"
+msgstr "नए पासवर्ड मेल नहीं खाते"
+
+msgid "Password changed successfully!"
+msgstr "पासवर्ड सफलतापूर्वक बदल दिया गया!"
+
+msgid "Your account has been deleted"
+msgstr "आपका खाता हटा दिया गया है"
+
+msgid "Incorrect password"
+msgstr "गलत पासवर्ड"

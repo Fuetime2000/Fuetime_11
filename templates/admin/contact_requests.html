@@ -1,0 +1,73 @@
+{% extends "admin/base.html" %}
+
+{% block admin_title %}{{ _('Contact Requests') }}{% endblock %}
+
+{% block admin_content %}
+<div class="card shadow mb-4">
+    <div class="card-body">
+        <div class="table-responsive">
+            <table class="table table-bordered" id="requestsTable">
+                <thead>
+                    <tr>
+                        <th>{{ _('ID') }}</th>
+                        <th>{{ _('Requester') }}</th>
+                        <th>{{ _('Requested User') }}</th>
+                        <th>{{ _('Message') }}</th>
+                        <th>{{ _('Status') }}</th>
+                        <th>{{ _('Date') }}</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for request in requests %}
+                    <tr>
+                        <td>{{ request.id }}</td>
+                        <td>
+                            <a href="{{ url_for('admin_user_detail', username=request.requester.username) }}">
+                                {{ request.requester.full_name }}
+                            </a>
+                        </td>
+                        <td>
+                            <a href="{{ url_for('admin_user_detail', username=request.requested.username) }}">
+                                {{ request.requested.full_name }}
+                            </a>
+                        </td>
+                        <td>{{ request.message }}</td>
+                        <td>
+                            <span class="badge bg-{{ 'success' if request.status == 'accepted' else 'danger' if request.status == 'rejected' else 'warning' }}">
+                                {{ _(request.status) }}
+                            </span>
+                        </td>
+                        <td>{{ request.created_at.strftime('%Y-%m-%d %H:%M:%S') }}</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+{% block extra_js %}
+<script>
+$(document).ready(function() {
+    $('#requestsTable').DataTable({
+        "order": [[0, "desc"]],
+        "language": {
+            "search": "{{ _('Search') }}:",
+            "lengthMenu": "{{ _('Show _MENU_ entries') }}",
+            "info": "{{ _('Showing _START_ to _END_ of _TOTAL_ entries') }}",
+            "infoEmpty": "{{ _('Showing 0 to 0 of 0 entries') }}",
+            "infoFiltered": "{{ _('(filtered from _MAX_ total entries)') }}",
+            "emptyTable": "{{ _('No data available in table') }}",
+            "zeroRecords": "{{ _('No matching records found') }}",
+            "paginate": {
+                "first": "{{ _('First') }}",
+                "last": "{{ _('Last') }}",
+                "next": "{{ _('Next') }}",
+                "previous": "{{ _('Previous') }}"
+            }
+        }
+    });
+});
+</script>
+{% endblock %}
+{% endblock %}

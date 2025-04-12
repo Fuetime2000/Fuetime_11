@@ -1,0 +1,94 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container py-5">
+    <h1 class="mb-4">Help Center</h1>
+    
+    <div class="accordion" id="helpAccordion">
+        <!-- Getting Started -->
+        <div class="accordion-item">
+            <h2 class="accordion-header">
+                <button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#gettingStarted">
+                    Getting Started
+                </button>
+            </h2>
+            <div id="gettingStarted" class="accordion-collapse collapse show" data-bs-parent="#helpAccordion">
+                <div class="accordion-body">
+                    <h5>How to Register</h5>
+                    <p>1. Click on the "Register" button in the navigation bar</p>
+                    <p>2. Fill in your personal and professional details</p>
+                    <p>3. Submit the form to create your profile</p>
+                    
+                    <h5>How to Find Workers</h5>
+                    <p>1. Browse through worker profiles on the home page</p>
+                    <p>2. Use the contact buttons to reach out to workers</p>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Communication -->
+        <div class="accordion-item">
+            <h2 class="accordion-header">
+                <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#communication">
+                    Communication
+                </button>
+            </h2>
+            <div id="communication" class="accordion-collapse collapse" data-bs-parent="#helpAccordion">
+                <div class="accordion-body">
+                    <h5>How to Contact Workers</h5>
+                    <p><i class="fas fa-phone"></i> <strong>Call:</strong> Click the phone icon to call directly</p>
+                    <p><i class="fas fa-comment"></i> <strong>Chat:</strong> Click the message icon to start a conversation</p>
+                    <p><i class="fas fa-share-alt"></i> <strong>Share:</strong> Click the share icon to share a profile</p>
+                    
+                    <h5>Using the Chat System</h5>
+                    <p>1. Click the message icon on any worker's profile</p>
+                    <p>2. Type your message in the chat box</p>
+                    <p>3. Press enter or click send to send your message</p>
+                    <p>4. You'll receive notifications for new messages</p>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Account Management -->
+        <div class="accordion-item">
+            <h2 class="accordion-header">
+                <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#account">
+                    Account Management
+                </button>
+            </h2>
+            <div id="account" class="accordion-collapse collapse" data-bs-parent="#helpAccordion">
+                <div class="accordion-body">
+                    <h5>Updating Your Profile</h5>
+                    <p>You can update your profile information at any time by:</p>
+                    <ol>
+                        <li>Logging into your account</li>
+                        <li>Going to your profile settings</li>
+                        <li>Making the necessary changes</li>
+                        <li>Saving your updates</li>
+                    </ol>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Support -->
+        <div class="accordion-item">
+            <h2 class="accordion-header">
+                <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#support">
+                    Support
+                </button>
+            </h2>
+            <div id="support" class="accordion-collapse collapse" data-bs-parent="#helpAccordion">
+                <div class="accordion-body">
+                    <h5>Need Additional Help?</h5>
+                    <p>If you need further assistance:</p>
+                    <ul>
+                        <li>Check our <a href="{{ url_for('faq') }}">FAQ section</a></li>
+                        <li>Visit our <a href="{{ url_for('contact') }}">Contact page</a></li>
+                        <li>Review our <a href="{{ url_for('terms') }}">Terms of Service</a></li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

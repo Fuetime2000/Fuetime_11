@@ -1,0 +1,108 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container">
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <div class="card">
+                <div class="card-header bg-primary text-white">
+                    <div class="d-flex align-items-center">
+                        {% if receiver.photo %}
+                        <img src="{{ url_for('static', filename='uploads/' + receiver.photo) }}" 
+                             alt="{{ receiver.full_name }}" class="rounded-circle me-2" width="40" height="40">
+                        {% else %}
+                        <img src="{{ url_for('static', filename='img/default-avatar.png') }}" 
+                             alt="Default Avatar" class="rounded-circle me-2" width="40" height="40">
+                        {% endif %}
+                        <h5 class="mb-0">{{ receiver.full_name }}</h5>
+                    </div>
+                </div>
+                <div class="card-body chat-body" id="chat-messages">
+                    {% for message in messages %}
+                    <div class="message {% if message.sender_id == current_user.id %}message-sent{% else %}message-received{% endif %} mb-3">
+                        <div class="message-content">
+                            {{ message.content }}
+                        </div>
+                        <small class="text-muted">
+                            {{ message.created_at.strftime('%I:%M %p | %b %d') }}
+                        </small>
+                    </div>
+                    {% endfor %}
+                </div>
+                <div class="card-footer">
+                    <form method="POST" id="message-form">
+                        <div class="input-group">
+                            <input type="text" class="form-control" name="content" placeholder="Type your message..." required>
+                            <button class="btn btn-primary" type="submit">
+                                <i class="fas fa-paper-plane"></i> Send
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+.chat-body {
+    height: 400px;
+    overflow-y: auto;
+    padding: 1rem;
+}
+
+.message {
+    max-width: 70%;
+    margin-bottom: 1rem;
+}
+
+.message-sent {
+    margin-left: auto;
+}
+
+.message-received {
+    margin-right: auto;
+}
+
+.message-content {
+    padding: 0.75rem;
+    border-radius: 1rem;
+    margin-bottom: 0.25rem;
+}
+
+.message-sent .message-content {
+    background-color: #007bff;
+    color: white;
+    border-top-right-radius: 0.25rem;
+}
+
+.message-received .message-content {
+    background-color: #f8f9fa;
+    border-top-left-radius: 0.25rem;
+}
+
+.message-sent small {
+    display: block;
+    text-align: right;
+}
+
+.message-received small {
+    display: block;
+    text-align: left;
+}
+</style>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const chatBody = document.getElementById('chat-messages');
+    chatBody.scrollTop = chatBody.scrollHeight;
+
+    const messageForm = document.getElementById('message-form');
+    messageForm.addEventListener('submit', function() {
+        setTimeout(() => {
+            chatBody.scrollTop = chatBody.scrollHeight;
+        }, 100);
+    });
+});
+</script>
+{% endblock %}

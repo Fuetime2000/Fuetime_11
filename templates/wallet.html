@@ -1,0 +1,215 @@
+{% extends "base.html" %}
+
+{% block title %}Wallet - Fuetime{% endblock %}
+
+{% block content %}
+<div class="container">
+    <div class="row">
+        <div class="col-md-8 mx-auto">
+            <div class="card mb-4">
+                <div class="card-body">
+                    <h2 class="card-title">
+                        <i class="fas fa-wallet"></i> Wallet Balance
+                    </h2>
+                    <h3 class="text-primary mb-4">₹<span id="walletBalance">{{ current_user.wallet_balance }}</span></h3>
+
+                    <div class="mb-4">
+                        <h4><i class="fas fa-plus-circle"></i> Add Money</h4>
+                        <div class="card">
+                            <div class="card-body">
+                                <form id="rechargeForm" class="mb-3">
+                                    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                                    <div class="input-group mb-3">
+                                        <span class="input-group-text">₹</span>
+                                        <input type="number" id="amount" name="amount" class="form-control" placeholder="Enter Amount" min="20" max="500" required>
+                                        <button type="button" id="addMoneyButton" class="btn btn-primary">
+                                            <i class="fas fa-plus-circle"></i> Add Money
+                                        </button>
+                                    </div>
+                                    <small class="text-muted">Min: ₹20, Max: ₹500</small>
+                                </form>
+                                <div class="alert alert-info">
+                                    <i class="fas fa-info-circle"></i> 
+                                    Add money to your wallet to access contact information of other users:
+                                    <ul class="mb-0">
+                                        <li>View phone number: ₹1.35 per contact</li>
+                                        <li>View email address: ₹0.35 per contact</li>
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div>
+                        <h4><i class="fas fa-history"></i> Transaction History</h4>
+                        {% if transactions %}
+                        <div class="list-group" id="transactionList">
+                            {% for txn in transactions %}
+                            <div class="list-group-item">
+                                <div class="d-flex justify-content-between align-items-center">
+                                    <div>
+                                        <h6 class="mb-0">{{ txn.description }}</h6>
+                                        <small class="text-muted">{{ txn.timestamp.strftime('%Y-%m-%d %H:%M:%S') }}</small>
+                                    </div>
+                                    <span class="badge {% if txn.amount > 0 %}bg-success{% else %}bg-danger{% endif %} rounded-pill">
+                                        {% if txn.amount > 0 %}+{% endif %}₹{{ txn.amount }}
+                                    </span>
+                                </div>
+                            </div>
+                            {% endfor %}
+                        </div>
+                        {% else %}
+                        <p class="text-muted" id="noTransactions">No transactions yet.</p>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script src="https://checkout.razorpay.com/v1/checkout.js"></script>
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const form = document.getElementById('rechargeForm');
+    const button = document.getElementById('addMoneyButton');
+    const amountInput = document.getElementById('amount');
+    const walletBalance = document.getElementById('walletBalance');
+    const transactionList = document.getElementById('transactionList');
+    const noTransactions = document.getElementById('noTransactions');
+    const csrfToken = document.querySelector('input[name="csrf_token"]').value;
+
+    // Prevent form submission
+    form.addEventListener('submit', function(e) {
+        e.preventDefault();
+    });
+
+    button.addEventListener('click', async function() {
+        try {
+            const amount = parseFloat(amountInput.value);
+            if (isNaN(amount) || amount < 20 || amount > 500) {
+                alert('Please enter an amount between ₹20 and ₹500');
+                return;
+            }
+
+            button.disabled = true;
+            button.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Processing...';
+
+            const formData = new FormData();
+            formData.append('amount', amount);
+            formData.append('csrf_token', csrfToken);
+
+            // Create Razorpay order
+            const orderResponse = await fetch('/create-recharge-order', {
+                method: 'POST',
+                body: formData,
+                headers: {
+                    'Accept': 'application/json',
+                    'X-CSRFToken': csrfToken
+                }
+            });
+            const orderData = await orderResponse.json();
+
+            if (!orderData.success) {
+                throw new Error(orderData.message);
+            }
+
+            // Initialize Razorpay checkout
+            const options = {
+                key: orderData.key_id,
+                amount: orderData.amount,
+                currency: 'INR',
+                name: 'Fuetime',
+                description: 'Wallet Recharge',
+                order_id: orderData.order_id,
+                prefill: {
+                    name: orderData.user_name,
+                    email: orderData.user_email,
+                    contact: orderData.user_phone
+                },
+                handler: function(response) {
+                    verifyPayment(response);
+                },
+                modal: {
+                    ondismiss: function() {
+                        button.disabled = false;
+                        button.innerHTML = '<i class="fas fa-plus-circle"></i> Add Money';
+                    }
+                }
+            };
+
+            const rzp = new Razorpay(options);
+            rzp.open();
+
+        } catch (error) {
+            console.error('Error:', error);
+            alert(error.message || 'Failed to process payment. Please try again.');
+            button.disabled = false;
+            button.innerHTML = '<i class="fas fa-plus-circle"></i> Add Money';
+        }
+    });
+
+    async function verifyPayment(response) {
+        try {
+            const formData = new FormData();
+            formData.append('razorpay_payment_id', response.razorpay_payment_id);
+            formData.append('razorpay_order_id', response.razorpay_order_id);
+            formData.append('razorpay_signature', response.razorpay_signature);
+            formData.append('csrf_token', csrfToken);
+
+            const verifyResponse = await fetch('/verify-recharge-payment', {
+                method: 'POST',
+                body: formData,
+                headers: {
+                    'Accept': 'application/json',
+                    'X-CSRFToken': csrfToken
+                }
+            });
+            const verifyData = await verifyResponse.json();
+
+            if (verifyData.success) {
+                // Update wallet balance
+                walletBalance.textContent = verifyData.new_balance;
+
+                // Add new transaction to list
+                if (noTransactions) {
+                    noTransactions.remove();
+                    const newList = document.createElement('div');
+                    newList.id = 'transactionList';
+                    newList.className = 'list-group';
+                    noTransactions.parentElement.appendChild(newList);
+                }
+
+                const now = new Date();
+                const txnHtml = `
+                    <div class="list-group-item">
+                        <div class="d-flex justify-content-between align-items-center">
+                            <div>
+                                <h6 class="mb-0">Wallet recharge via Razorpay (ID: ${response.razorpay_payment_id})</h6>
+                                <small class="text-muted">${now.toISOString().slice(0, 19).replace('T', ' ')}</small>
+                            </div>
+                            <span class="badge bg-success rounded-pill">+₹${amountInput.value}</span>
+                        </div>
+                    </div>
+                `;
+                transactionList.insertAdjacentHTML('afterbegin', txnHtml);
+
+                // Reset form
+                amountInput.value = '';
+                alert('Payment successful! Your wallet has been recharged.');
+            } else {
+                throw new Error(verifyData.message);
+            }
+        } catch (error) {
+            console.error('Error:', error);
+            alert('An error occurred while verifying the payment. Please contact support.');
+        } finally {
+            button.disabled = false;
+            button.innerHTML = '<i class="fas fa-plus-circle"></i> Add Money';
+        }
+    }
+});
+</script>
+{% endblock %}

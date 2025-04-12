@@ -1,0 +1,423 @@
+{% extends "base.html" %}
+
+{% block title %}{{ user.full_name|default('User Profile') }} - Profile{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+    <div class="row">
+        <!-- Profile Card -->
+        <div class="col-lg-4 mb-4">
+            <div class="card shadow-sm">
+                <div class="card-body text-center">
+                    <div class="profile-image-container mb-4">
+                        {% if user.photo %}
+                            {% set photo_path = user.photo %}
+                            {% if 'static/' in photo_path %}
+                                {% set photo_path = photo_path.replace('static/', '') %}
+                            {% endif %}
+                            <img src="{{ url_for('static', filename=photo_path) }}" 
+                                 alt="{{ user.full_name }}" 
+                                 class="rounded-circle profile-image">
+                        {% else %}
+                            <img src="{{ url_for('static', filename='img/default-avatar.svg') }}" 
+                                 alt="{{ user.full_name }}" 
+                                 class="rounded-circle profile-image">
+                        {% endif %}
+                    </div>
+                    <h3 class="mb-0">{{ user.full_name|default('User') }}</h3>
+                    <p class="text-muted mb-3">{{ user.work|default('Work not specified') }}</p>
+                    
+                    <div class="profile-stats text-center mb-4">
+                        <div class="row">
+                            <div class="col">
+                                <h4>{{ user.total_reviews }}</h4>
+                                <small class="text-muted">Reviews</small>
+                            </div>
+                            <div class="col">
+                                <h4>{{ "%.1f"|format(user.average_rating|default(0)) }}</h4>
+                                <small class="text-muted">Rating</small>
+                            </div>
+                            <div class="col">
+                                <h4>{{ user.profile_views }}</h4>
+                                <small class="text-muted">Views</small>
+                            </div>
+                        </div>
+                    </div>
+
+                    {% if current_user.id != user.id %}
+                    <div class="d-grid gap-2">
+                        <a href="{{ url_for('chat', user_id=user.id) }}" class="btn btn-primary">
+                            <i class="fas fa-envelope me-2 text-light"></i>Send Message
+                        </a>
+                        <button onclick="handleCall('{{ user.phone }}')" class="btn btn-success">
+                            <i class="fas fa-phone me-2"></i>Call Now
+                        </button>
+                        <button onclick="handleShare(`{{ url_for('profile', user_id=user.id, _external=true) }}`)" class="btn btn-info">
+                            <i class="fas fa-share me-2"></i>Share Profile
+                        </button>
+                        <button class="btn btn-outline-primary" data-bs-toggle="modal" data-bs-target="#reviewModal">
+                            <i class="fas fa-star me-2 text-primary"></i>Write Review
+                        </button>
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+
+        <!-- Details and Reviews -->
+        <div class="col-lg-8">
+            <!-- Details Card -->
+            <div class="card shadow-sm mb-4">
+                <div class="card-body">
+                    <h4 class="card-title mb-4">Profile Details</h4>
+                    
+                    <div class="row">
+                        <div class="col-md-6">
+                            {% if user.education %}
+                            <div class="mb-3">
+                                <h6 class="text-muted mb-1">
+                                    <i class="fas fa-graduation-cap me-2 text-primary"></i>Education
+                                </h6>
+                                <p class="mb-0">{{ user.education }}</p>
+                            </div>
+                            {% endif %}
+                            
+                            {% if user.experience %}
+                            <div class="mb-3">
+                                <h6 class="text-muted mb-1">
+                                    <i class="fas fa-briefcase me-2 text-primary"></i>Experience
+                                </h6>
+                                <p class="mb-0">{{ user.experience }}</p>
+                            </div>
+                            {% endif %}
+                        </div>
+                        
+                        <div class="col-md-6">
+                            {% if user.current_location %}
+                            <div class="mb-3">
+                                <h6 class="text-muted mb-1">
+                                    <i class="fas fa-map-marker-alt me-2 text-primary"></i>Location
+                                </h6>
+                                <p class="mb-0">{{ user.current_location }}</p>
+                            </div>
+                            {% endif %}
+                            
+                            {% if user.skills %}
+                            <div class="mb-3">
+                                <h6 class="text-muted mb-1">
+                                    <i class="fas fa-tools me-2 text-primary"></i>Skills
+                                </h6>
+                                <div class="skills-container">
+                                    {% for skill in user.skills.split(',') %}
+                                    <span class="badge bg-primary me-2 mb-2">{{ skill.strip() }}</span>
+                                    {% endfor %}
+                                </div>
+                            </div>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Reviews Card -->
+            <div class="card shadow-sm">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-center mb-4">
+                        <h4 class="card-title mb-0">Reviews</h4>
+                        <div class="overall-rating">
+                            <span class="h5 mb-0 me-2">{{ "%.1f"|format(user.average_rating|default(0)) }}</span>
+                            {% for i in range(5) %}
+                                {% if i < (user.average_rating|default(0)|int) %}
+                                <i class="fas fa-star text-warning"></i>
+                                {% else %}
+                                <i class="far fa-star text-warning"></i>
+                                {% endif %}
+                            {% endfor %}
+                            <span class="text-muted ms-2">({{ user.total_reviews }} reviews)</span>
+                        </div>
+                    </div>
+
+                    {% if reviews %}
+                        <div class="reviews-container">
+                            {% for review in reviews %}
+                            <div class="review-item mb-4">
+                                <div class="d-flex align-items-center mb-2">
+                                    {% if review.reviewer_user.photo %}
+                                        {% set reviewer_photo = review.reviewer_user.photo %}
+                                        {% if 'static/' in reviewer_photo %}
+                                            {% set reviewer_photo = reviewer_photo.replace('static/', '') %}
+                                        {% endif %}
+                                        <img src="{{ url_for('static', filename=reviewer_photo) }}" 
+                                             alt="{{ review.reviewer_user.full_name }}" 
+                                             class="rounded-circle me-3 review-avatar">
+                                    {% else %}
+                                        <img src="{{ url_for('static', filename='img/default-avatar.svg') }}" 
+                                             alt="{{ review.reviewer_user.full_name }}" 
+                                             class="rounded-circle me-3 review-avatar">
+                                    {% endif %}
+                                    <div>
+                                        <h6 class="mb-0">{{ review.reviewer_user.full_name }}</h6>
+                                        <small class="text-muted">{{ review.created_at.strftime('%B %d, %Y') }}</small>
+                                    </div>
+                                </div>
+                                <div class="mb-2">
+                                    {% for i in range(5) %}
+                                        {% if i < review.rating %}
+                                        <i class="fas fa-star text-warning"></i>
+                                        {% else %}
+                                        <i class="far fa-star text-warning"></i>
+                                        {% endif %}
+                                    {% endfor %}
+                                    <small class="text-muted ms-2">{{ review.created_at.strftime('%I:%M %p') }}</small>
+                                </div>
+                                <p class="mb-0">{{ review.comment }}</p>
+                            </div>
+                            {% if not loop.last %}
+                            <hr class="my-4">
+                            {% endif %}
+                            {% endfor %}
+                        </div>
+                    {% else %}
+                        <div class="text-center py-4">
+                            <i class="far fa-comment-alt fa-3x text-primary mb-3"></i>
+                            <p class="text-muted mb-0">No reviews yet.</p>
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Review Modal -->
+{% if current_user.id != user.id %}
+<div class="modal fade" id="reviewModal" tabindex="-1" aria-labelledby="reviewModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="reviewModalLabel">
+                    <i class="fas fa-star text-warning me-2"></i>Write a Review
+                </h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <form method="POST" action="{{ url_for('review', worker_id=user.id) }}" id="reviewForm">
+                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                <div class="modal-body">
+                    <div class="mb-4">
+                        <label class="form-label d-block text-center">Your Rating</label>
+                        <div class="rating-input text-center">
+                            {% for i in range(5, 0, -1) %}
+                            <input type="radio" id="star{{ i }}" name="rating" value="{{ i }}" required>
+                            <label for="star{{ i }}"><i class="far fa-star"></i></label>
+                            {% endfor %}
+                        </div>
+                        <div class="invalid-feedback text-center">Please select a rating</div>
+                    </div>
+                    <div class="mb-3">
+                        <label for="comment" class="form-label">Your Review</label>
+                        <textarea class="form-control" id="comment" name="comment" rows="4" required 
+                                  minlength="10" maxlength="500" 
+                                  placeholder="Share your experience..."></textarea>
+                        <div class="form-text text-muted">
+                            Minimum 10 characters, maximum 500 characters
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <button type="submit" class="btn btn-primary">
+                        <i class="fas fa-paper-plane me-2"></i>Submit Review
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+{% endif %}
+{% endblock %}
+
+{% block styles %}
+<style>
+.profile-image-container {
+    position: relative;
+    width: 150px;
+    height: 150px;
+    margin: 0 auto;
+    border-radius: 50%;
+    overflow: hidden;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+}
+
+.profile-image {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.review-avatar {
+    width: 48px;
+    height: 48px;
+    object-fit: cover;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+.skills-container {
+    margin-top: 0.5rem;
+}
+
+.rating-input {
+    display: flex;
+    flex-direction: row-reverse;
+    justify-content: center;
+    gap: 0.5rem;
+    margin: 1rem 0;
+}
+
+.rating-input input {
+    display: none;
+}
+
+.rating-input label {
+    cursor: pointer;
+    font-size: 2rem;
+    color: #dee2e6;
+    transition: all 0.2s ease;
+}
+
+.rating-input label:hover,
+.rating-input label:hover ~ label,
+.rating-input input:checked ~ label {
+    color: #ffc107;
+    transform: scale(1.1);
+}
+
+.rating-input label i {
+    transition: all 0.2s ease;
+}
+
+.reviews-container {
+    max-height: 600px;
+    overflow-y: auto;
+    scrollbar-width: thin;
+    scrollbar-color: rgba(0,0,0,0.2) transparent;
+}
+
+.reviews-container::-webkit-scrollbar {
+    width: 6px;
+}
+
+.reviews-container::-webkit-scrollbar-track {
+    background: transparent;
+}
+
+.reviews-container::-webkit-scrollbar-thumb {
+    background-color: rgba(0,0,0,0.2);
+    border-radius: 3px;
+}
+
+.review-item:last-child {
+    margin-bottom: 0 !important;
+}
+
+.card {
+    border: none;
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 0.5rem 1rem rgba(0,0,0,0.1) !important;
+}
+
+@media (max-width: 768px) {
+    .profile-stats {
+        margin-top: 1rem;
+    }
+    
+    .col-md-6 {
+        margin-bottom: 1rem;
+    }
+
+    .rating-input label {
+        font-size: 1.75rem;
+    }
+}
+</style>
+{% endblock %}
+
+{% block scripts %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const reviewForm = document.getElementById('reviewForm');
+    const ratingInputs = document.querySelectorAll('.rating-input input');
+    const ratingLabels = document.querySelectorAll('.rating-input label');
+    
+    // Initialize star rating system
+    ratingLabels.forEach(label => {
+        label.addEventListener('mouseover', function() {
+            this.querySelector('i').classList.remove('far');
+            this.querySelector('i').classList.add('fas');
+            
+            let current = this;
+            while (current.nextElementSibling) {
+                current.nextElementSibling.querySelector('i').classList.remove('far');
+                current.nextElementSibling.querySelector('i').classList.add('fas');
+                current = current.nextElementSibling;
+            }
+        });
+        
+        label.addEventListener('mouseout', function() {
+            if (!this.previousElementSibling.checked) {
+                let current = this;
+                while (current) {
+                    current.querySelector('i').classList.remove('fas');
+                    current.querySelector('i').classList.add('far');
+                    current = current.nextElementSibling;
+                }
+            }
+        });
+        
+        label.previousElementSibling.addEventListener('change', function() {
+            ratingLabels.forEach(l => {
+                l.querySelector('i').classList.remove('fas');
+                l.querySelector('i').classList.add('far');
+            });
+            
+            let current = this.nextElementSibling;
+            while (current) {
+                current.querySelector('i').classList.remove('far');
+                current.querySelector('i').classList.add('fas');
+                current = current.nextElementSibling;
+            }
+        });
+    });
+
+    // Form validation
+    if (reviewForm) {
+        reviewForm.addEventListener('submit', function(e) {
+            const rating = document.querySelector('input[name="rating"]:checked');
+            const comment = document.getElementById('comment');
+            let isValid = true;
+
+            if (!rating) {
+                document.querySelector('.rating-input').nextElementSibling.style.display = 'block';
+                isValid = false;
+            } else {
+                document.querySelector('.rating-input').nextElementSibling.style.display = 'none';
+            }
+
+            if (!comment.value.trim() || comment.value.length < 10 || comment.value.length > 500) {
+                comment.classList.add('is-invalid');
+                isValid = false;
+            } else {
+                comment.classList.remove('is-invalid');
+            }
+
+            if (!isValid) {
+                e.preventDefault();
+            }
+        });
+    }
+});
+</script>
+{% endblock %}

@@ -1,0 +1,81 @@
+{% extends "base.html" %}
+
+{% block title %}{{ _('Home') }}{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <!-- Search and Filter Section -->
+    <div class="card mb-4">
+        <div class="card-body">
+            <form method="get" class="row g-3">
+                <div class="col-md-4">
+                    <label for="search" class="form-label">{{ _('Search') }}</label>
+                    <input type="text" class="form-control" id="search" name="q" value="{{ request.args.get('q', '') }}" 
+                           placeholder="{{ _('Search by name, skills, or location') }}">
+                </div>
+                <div class="col-md-3">
+                    <label for="category" class="form-label">{{ _('Category') }}</label>
+                    <select class="form-select" id="category" name="category">
+                        <option value="">{{ _('All Categories') }}</option>
+                        {% for category in categories %}
+                        <option value="{{ category }}" {% if request.args.get('category') == category %}selected{% endif %}>
+                            {{ category }}
+                        </option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="col-md-3">
+                    <label for="location" class="form-label">{{ _('Location') }}</label>
+                    <select class="form-select" id="location" name="location">
+                        <option value="">{{ _('All Locations') }}</option>
+                        {% for location in locations %}
+                        <option value="{{ location }}" {% if request.args.get('location') == location %}selected{% endif %}>
+                            {{ location }}
+                        </option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="col-md-2 d-flex align-items-end">
+                    <button type="submit" class="btn btn-primary w-100">
+                        <i class="fas fa-search"></i> {{ _('Search') }}
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Results Section -->
+    <div class="row">
+        {% for user in users %}
+        <div class="col-md-6 col-lg-4 mb-4">
+            {% include 'components/profile_card.html' %}
+        </div>
+        {% else %}
+        <div class="col-12">
+            <div class="alert alert-info">
+                <i class="fas fa-info-circle"></i> {{ _('No users found matching your criteria.') }}
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+
+    <!-- Pagination -->
+    {% if pagination.pages > 1 %}
+    <nav aria-label="Page navigation" class="mt-4">
+        <ul class="pagination justify-content-center">
+            {% for page in pagination.iter_pages() %}
+                {% if page %}
+                    <li class="page-item {% if page == pagination.page %}active{% endif %}">
+                        <a class="page-link" href="{{ url_for('index', page=page, **request.args) }}">{{ page }}</a>
+                    </li>
+                {% else %}
+                    <li class="page-item disabled">
+                        <span class="page-link">...</span>
+                    </li>
+                {% endif %}
+            {% endfor %}
+        </ul>
+    </nav>
+    {% endif %}
+</div>
+{% endblock %}

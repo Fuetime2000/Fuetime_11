@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Razorpay Payment</title>
+    <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
+</head>
+<body>
+    <h1>Complete Your Payment</h1>
+    <h3>Amount: ₹{{ amount }}</h3>
+
+    <form id="razorpay-form" action="/payment-success" method="POST">
+        <script
+            src="https://checkout.razorpay.com/v1/checkout.js"
+            data-key="{{ order['key'] }}"
+            data-amount="{{ order['amount'] }}"
+            data-currency="INR"
+            data-order_id="{{ order['id'] }}"
+            data-buttontext="Pay Now"
+            data-name="Fuetime Wallet"
+            data-description="Add Money to Your Wallet"
+            data-theme.color="#F37254">
+        </script>
+        <input type="hidden" name="amount" value="{{ amount }}">
+    </form>
+</body>
+</html>
+
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Razorpay Payment</title>
+    <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
+</head>
+<body>
+    <h1>Complete Your Payment</h1>
+    <h3>Amount: ₹{{ amount }}</h3>
+
+    <form id="razorpay-form" action="/payment-success" method="POST">
+        <script
+            src="https://checkout.razorpay.com/v1/checkout.js"
+            data-key="{{ order['key'] }}"
+            data-amount="{{ order['amount'] }}"
+            data-currency="INR"
+            data-order_id="{{ order['id'] }}"
+            data-buttontext="Pay Now"
+            data-name="Fuetime Wallet"
+            data-description="Add Money to Your Wallet"
+            data-theme.color="#F37254">
+        </script>
+        <input type="hidden" name="amount" value="{{ amount }}">
+    </form>
+</body>
+</html>

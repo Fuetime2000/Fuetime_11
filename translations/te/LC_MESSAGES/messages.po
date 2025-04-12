@@ -1,0 +1,97 @@
+msgid ""
+msgstr ""
+"Project-Id-Version: Fuetime\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2024-02-18 08:30+0530\n"
+"PO-Revision-Date: 2024-02-18 08:30+0530\n"
+"Last-Translator: \n"
+"Language-Team: Telugu\n"
+"Language: te\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+
+msgid "Fuetime - Connect with Skilled People"
+msgstr "ఫ్యూటైమ్ - నైపుణ్యం ఉన్న వ్యక్తులతో కనెక్ట్ అవ్వండి"
+
+msgid "Fuetime"
+msgstr "ఫ్యూటైమ్"
+
+msgid "Home"
+msgstr "హోమ్"
+
+msgid "Messages"
+msgstr "సందేశాలు"
+
+msgid "My Profile"
+msgstr "నా ప్రొఫైల్"
+
+msgid "Account Settings"
+msgstr "ఖాతా సెట్టింగ్‌లు"
+
+msgid "Logout"
+msgstr "లాగ్అవుట్"
+
+msgid "Login"
+msgstr "లాగిన్"
+
+msgid "Register"
+msgstr "నమోదు"
+
+msgid "Find Skilled People Near You"
+msgstr "మీ దగ్గర నైపుణ్యం ఉన్న వ్యక్తులను కనుగొనండి"
+
+msgid "Search by skills or services"
+msgstr "నైపుణ్యాలు లేదా సేవల ద్వారా శోధించండి"
+
+msgid "Enter location"
+msgstr "స్థానాన్ని నమోదు చేయండి"
+
+msgid "Search"
+msgstr "శోధించు"
+
+msgid "Email already registered"
+msgstr "ఇమెయిల్ ఇప్పటికే నమోదు చేయబడింది"
+
+msgid "Registration successful!"
+msgstr "నమోదు విజయవంతమైంది!"
+
+msgid "Logged in successfully!"
+msgstr "విజయవంతంగా లాగిన్ అయ్యారు!"
+
+msgid "Invalid email or password"
+msgstr "చెల్లని ఇమెయిల్ లేదా పాస్‌వర్డ్"
+
+msgid "Logged out successfully"
+msgstr "విజయవంతంగా లాగ్అవుట్ అయ్యారు"
+
+msgid "You cannot review yourself"
+msgstr "మీరు మిమ్మల్ని మీరు సమీక్షించలేరు"
+
+msgid "Review submitted successfully"
+msgstr "సమీక్ష విజయవంతంగా సమర్పించబడింది"
+
+msgid "You cannot message yourself"
+msgstr "మీరు మీకు మీరే సందేశం పంపలేరు"
+
+msgid "Message sent successfully"
+msgstr "సందేశం విజయవంతంగా పంపబడింది"
+
+msgid "Profile updated successfully!"
+msgstr "ప్రొఫైల్ విజయవంతంగా నవీకరించబడింది!"
+
+msgid "Current password is incorrect"
+msgstr "ప్రస్తుత పాస్‌వర్డ్ తప్పు"
+
+msgid "New passwords do not match"
+msgstr "కొత్త పాస్‌వర్డ్‌లు సరిపోలలేదు"
+
+msgid "Password changed successfully!"
+msgstr "పాస్‌వర్డ్ విజయవంతంగా మార్చబడింది!"
+
+msgid "Your account has been deleted"
+msgstr "మీ ఖాతా తొలగించబడింది"
+
+msgid "Incorrect password"
+msgstr "తప్పు పాస్‌వర్డ్"

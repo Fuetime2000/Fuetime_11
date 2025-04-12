@@ -1,0 +1,73 @@
+{% extends "admin/base.html" %}
+
+{% block admin_title %}{{ _('User Management') }}{% endblock %}
+
+{% block admin_content %}
+<div class="card shadow mb-4">
+    <div class="card-body">
+        <div class="table-responsive">
+            <table class="table table-bordered" id="usersTable">
+                <thead>
+                    <tr>
+                        <th>{{ _('ID') }}</th>
+                        <th>{{ _('Name') }}</th>
+                        <th>{{ _('Email') }}</th>
+                        <th>{{ _('Phone') }}</th>
+                        <th>{{ _('Location') }}</th>
+                        <th>{{ _('Status') }}</th>
+                        <th>{{ _('Rating') }}</th>
+                        <th>{{ _('Actions') }}</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for user in users %}
+                    <tr>
+                        <td>{{ user.id }}</td>
+                        <td>{{ user.full_name }}</td>
+                        <td>{{ user.email }}</td>
+                        <td>{{ user.phone }}</td>
+                        <td>{{ user.current_location or user.live_location or _('Not set') }}</td>
+                        <td>
+                            <span class="badge bg-{{ 'success' if user.availability == 'available' else 'warning' if user.availability == 'busy' else 'danger' }}">
+                                {{ _(user.availability) }}
+                            </span>
+                        </td>
+                        <td>{{ "%.1f"|format(user.average_rating) }} ({{ user.total_reviews }})</td>
+                        <td>
+                            <a href="{{ url_for('admin_user_detail', username=user.username) }}" class="btn btn-primary btn-sm">
+                                <i class="fas fa-edit"></i> {{ _('Edit') }}
+                            </a>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+{% block extra_js %}
+<script>
+$(document).ready(function() {
+    $('#usersTable').DataTable({
+        "order": [[0, "desc"]],
+        "language": {
+            "search": "{{ _('Search') }}:",
+            "lengthMenu": "{{ _('Show _MENU_ entries') }}",
+            "info": "{{ _('Showing _START_ to _END_ of _TOTAL_ entries') }}",
+            "infoEmpty": "{{ _('Showing 0 to 0 of 0 entries') }}",
+            "infoFiltered": "{{ _('(filtered from _MAX_ total entries)') }}",
+            "emptyTable": "{{ _('No data available in table') }}",
+            "zeroRecords": "{{ _('No matching records found') }}",
+            "paginate": {
+                "first": "{{ _('First') }}",
+                "last": "{{ _('Last') }}",
+                "next": "{{ _('Next') }}",
+                "previous": "{{ _('Previous') }}"
+            }
+        }
+    });
+});
+</script>
+{% endblock %}
+{% endblock %}

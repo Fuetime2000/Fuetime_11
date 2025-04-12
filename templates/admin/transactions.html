@@ -1,0 +1,63 @@
+{% extends "admin/base.html" %}
+
+{% block admin_title %}{{ _('Transaction History') }}{% endblock %}
+
+{% block admin_content %}
+<div class="card shadow mb-4">
+    <div class="card-body">
+        <div class="table-responsive">
+            <table class="table table-bordered" id="transactionsTable">
+                <thead>
+                    <tr>
+                        <th>{{ _('ID') }}</th>
+                        <th>{{ _('User') }}</th>
+                        <th>{{ _('Amount') }}</th>
+                        <th>{{ _('Description') }}</th>
+                        <th>{{ _('Date') }}</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for transaction in transactions %}
+                    <tr>
+                        <td>{{ transaction.id }}</td>
+                        <td>
+                            <a href="{{ url_for('admin_user_detail', username=transaction.user.username) }}">
+                                {{ transaction.user.full_name }}
+                            </a>
+                        </td>
+                        <td>₹{{ "%.2f"|format(transaction.amount) }}</td>
+                        <td>{{ transaction.description }}</td>
+                        <td>{{ transaction.timestamp.strftime('%Y-%m-%d %H:%M:%S') }}</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+{% block extra_js %}
+<script>
+$(document).ready(function() {
+    $('#transactionsTable').DataTable({
+        "order": [[0, "desc"]],
+        "language": {
+            "search": "{{ _('Search') }}:",
+            "lengthMenu": "{{ _('Show _MENU_ entries') }}",
+            "info": "{{ _('Showing _START_ to _END_ of _TOTAL_ entries') }}",
+            "infoEmpty": "{{ _('Showing 0 to 0 of 0 entries') }}",
+            "infoFiltered": "{{ _('(filtered from _MAX_ total entries)') }}",
+            "emptyTable": "{{ _('No data available in table') }}",
+            "zeroRecords": "{{ _('No matching records found') }}",
+            "paginate": {
+                "first": "{{ _('First') }}",
+                "last": "{{ _('Last') }}",
+                "next": "{{ _('Next') }}",
+                "previous": "{{ _('Previous') }}"
+            }
+        }
+    });
+});
+</script>
+{% endblock %}
+{% endblock %}

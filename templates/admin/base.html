@@ -1,0 +1,153 @@
+{% extends "base.html" %}
+
+{% block styles %}
+{{ super() }}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/admin.css') }}">
+{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <div class="row">
+        <!-- Sidebar -->
+        <nav id="sidebar" class="col-md-3 col-lg-2 d-md-block sidebar collapse">
+            <div class="position-sticky">
+                <div class="sidebar-brand d-flex align-items-center justify-content-center py-4">
+                    <i class="fas fa-fw fa-tools me-2"></i>
+                    <span class="sidebar-brand-text">{{ _('Admin Panel') }}</span>
+                </div>
+                
+                <hr class="sidebar-divider">
+                
+                <ul class="nav flex-column">
+                    <li class="nav-item">
+                        <a class="nav-link {% if request.endpoint == 'admin_dashboard' %}active{% endif %}" 
+                           href="{{ url_for('admin_dashboard') }}">
+                            <i class="fas fa-tachometer-alt"></i>
+                            <span>{{ _('Dashboard') }}</span>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link {% if request.endpoint == 'admin_users' %}active{% endif %}" 
+                           href="{{ url_for('admin_users') }}">
+                            <i class="fas fa-users"></i>
+                            <span>{{ _('Users') }}</span>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link {% if request.endpoint == 'admin_transactions' %}active{% endif %}" 
+                           href="{{ url_for('admin_transactions') }}">
+                            <i class="fas fa-money-bill-wave"></i>
+                            <span>{{ _('Transactions') }}</span>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link {% if request.endpoint == 'admin_contact_requests' %}active{% endif %}" 
+                           href="{{ url_for('admin_contact_requests') }}">
+                            <i class="fas fa-envelope"></i>
+                            <span>{{ _('Contact Requests') }}</span>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link {% if request.endpoint == 'admin_reviews' %}active{% endif %}" 
+                           href="{{ url_for('admin_reviews') }}">
+                            <i class="fas fa-star"></i>
+                            <span>{{ _('Reviews') }}</span>
+                        </a>
+                    </li>
+                </ul>
+                
+                <hr class="sidebar-divider">
+                
+                <!-- Admin Profile -->
+                <div class="sidebar-profile p-3">
+                    <div class="d-flex align-items-center">
+                        <img src="{{ current_user.photo or url_for('static', filename='img/default-avatar.png') }}" 
+                             class="rounded-circle me-2" width="40" height="40" alt="">
+                        <div>
+                            <div class="fw-bold">{{ current_user.full_name }}</div>
+                            <small class="text-muted">{{ _('Administrator') }}</small>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </nav>
+
+        <!-- Main content -->
+        <main class="col-md-9 ms-sm-auto col-lg-10 px-md-4">
+            <!-- Topbar -->
+            <nav class="navbar navbar-expand navbar-light bg-white topbar mb-4 static-top shadow-sm">
+                <!-- Sidebar Toggle (Mobile) -->
+                <button id="sidebarToggleTop" class="btn btn-link d-md-none rounded-circle me-3">
+                    <i class="fas fa-bars"></i>
+                </button>
+
+                <!-- Search -->
+                <form class="d-none d-sm-inline-block form-inline me-auto ms-md-3 my-2 my-md-0 mw-100 navbar-search">
+                    <div class="input-group">
+                        <input type="text" class="form-control bg-light border-0 small" placeholder="{{ _('Search for...') }}"
+                               aria-label="Search" aria-describedby="basic-addon2">
+                        <button class="btn btn-primary" type="button">
+                            <i class="fas fa-search fa-sm"></i>
+                        </button>
+                    </div>
+                </form>
+
+                <!-- Topbar Navbar -->
+                <ul class="navbar-nav ms-auto">
+                    <!-- Notifications -->
+                    <li class="nav-item dropdown mx-1">
+                        <a class="nav-link dropdown-toggle" href="#" id="alertsDropdown" role="button"
+                           data-bs-toggle="dropdown" aria-expanded="false">
+                            <i class="fas fa-bell fa-fw"></i>
+                            <span class="badge bg-danger">3+</span>
+                        </a>
+                    </li>
+
+                    <!-- Messages -->
+                    <li class="nav-item dropdown mx-1">
+                        <a class="nav-link dropdown-toggle" href="#" id="messagesDropdown" role="button"
+                           data-bs-toggle="dropdown" aria-expanded="false">
+                            <i class="fas fa-envelope fa-fw"></i>
+                            <span class="badge bg-danger">7</span>
+                        </a>
+                    </li>
+
+                    <div class="topbar-divider d-none d-sm-block"></div>
+
+                    <!-- User Information -->
+                    <li class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle" href="#" id="userDropdown" role="button"
+                           data-bs-toggle="dropdown" aria-expanded="false">
+                            <span class="me-2 d-none d-lg-inline text-gray-600 small">{{ current_user.full_name }}</span>
+                            <img class="img-profile rounded-circle" width="32" height="32"
+                                 src="{{ current_user.photo or url_for('static', filename='img/default-avatar.png') }}">
+                        </a>
+                    </li>
+                </ul>
+            </nav>
+
+            <!-- Page Content -->
+            <div class="container-fluid">
+                {% block admin_title %}{% endblock %}
+                {% block admin_content %}{% endblock %}
+            </div>
+        </main>
+    </div>
+</div>
+
+{% block extra_js %}{% endblock %}
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Mobile sidebar toggle
+    const sidebarToggle = document.getElementById('sidebarToggleTop');
+    const sidebar = document.getElementById('sidebar');
+    
+    if (sidebarToggle) {
+        sidebarToggle.addEventListener('click', function() {
+            sidebar.classList.toggle('show');
+        });
+    }
+});
+</script>
+{% endblock %}

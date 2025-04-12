@@ -1,0 +1,97 @@
+msgid ""
+msgstr ""
+"Project-Id-Version: Fuetime\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2024-02-18 08:30+0530\n"
+"PO-Revision-Date: 2024-02-18 08:30+0530\n"
+"Last-Translator: \n"
+"Language-Team: Tamil\n"
+"Language: ta\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+
+msgid "Fuetime - Connect with Skilled People"
+msgstr "ஃப்யூடைம் - திறமையான மக்களுடன் இணையுங்கள்"
+
+msgid "Fuetime"
+msgstr "ஃப்யூடைம்"
+
+msgid "Home"
+msgstr "முகப்பு"
+
+msgid "Messages"
+msgstr "செய்திகள்"
+
+msgid "My Profile"
+msgstr "என் சுயவிவரம்"
+
+msgid "Account Settings"
+msgstr "கணக்கு அமைப்புகள்"
+
+msgid "Logout"
+msgstr "வெளியேறு"
+
+msgid "Login"
+msgstr "உள்நுழைய"
+
+msgid "Register"
+msgstr "பதிவு செய்க"
+
+msgid "Find Skilled People Near You"
+msgstr "உங்கள் அருகில் திறமையான மக்களைக் கண்டறியுங்கள்"
+
+msgid "Search by skills or services"
+msgstr "திறன்கள் அல்லது சேவைகள் மூலம் தேடுங்கள்"
+
+msgid "Enter location"
+msgstr "இருப்பிடத்தை உள்ளிடவும்"
+
+msgid "Search"
+msgstr "தேடு"
+
+msgid "Email already registered"
+msgstr "மின்னஞ்சல் ஏற்கனவே பதிவு செய்யப்பட்டுள்ளது"
+
+msgid "Registration successful!"
+msgstr "பதிவு வெற்றிகரமாக முடிந்தது!"
+
+msgid "Logged in successfully!"
+msgstr "வெற்றிகரமாக உள்நுழைந்தீர்கள்!"
+
+msgid "Invalid email or password"
+msgstr "தவறான மின்னஞ்சல் அல்லது கடவுச்சொல்"
+
+msgid "Logged out successfully"
+msgstr "வெற்றிகரமாக வெளியேறினீர்கள்"
+
+msgid "You cannot review yourself"
+msgstr "நீங்கள் உங்களை மதிப்பாய்வு செய்ய முடியாது"
+
+msgid "Review submitted successfully"
+msgstr "மதிப்பாய்வு வெற்றிகரமாக சமர்ப்பிக்கப்பட்டது"
+
+msgid "You cannot message yourself"
+msgstr "நீங்கள் உங்களுக்கு செய்தி அனுப்ப முடியாது"
+
+msgid "Message sent successfully"
+msgstr "செய்தி வெற்றிகரமாக அனுப்பப்பட்டது"
+
+msgid "Profile updated successfully!"
+msgstr "சுயவிவரம் வெற்றிகரமாக புதுப்பிக்கப்பட்டது!"
+
+msgid "Current password is incorrect"
+msgstr "தற்போதைய கடவுச்சொல் தவறானது"
+
+msgid "New passwords do not match"
+msgstr "புதிய கடவுச்சொற்கள் பொருந்தவில்லை"
+
+msgid "Password changed successfully!"
+msgstr "கடவுச்சொல் வெற்றிகரமாக மாற்றப்பட்டது!"
+
+msgid "Your account has been deleted"
+msgstr "உங்கள் கணக்கு நீக்கப்பட்டது"
+
+msgid "Incorrect password"
+msgstr "தவறான கடவுச்சொல்"
